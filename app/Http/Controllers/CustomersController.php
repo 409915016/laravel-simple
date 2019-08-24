@@ -9,18 +9,23 @@ class CustomersController extends Controller
 {
     public function list()
     {
-	      $customers = Customer::all();
+        $customers = Customer::all();
 
-		    return view('internals.customers',[
-				    'customers' => $customers
-		    ]);
+        return view('internals.customers', [
+            'customers' => $customers
+        ]);
     }
 
     public function store()
     {
-	      $customers = new Customer();
-	      $customers -> name = request('name');
-				$customers -> save();
-				return back();
+        $data = request()->validate([
+            'name' => 'required|min:3',
+            'email' => 'required|email'
+        ]);
+        $customers = new Customer();
+        $customers->name = request('name');
+        $customers->email = request('email');
+        $customers->save();
+        return back();
     }
 }
