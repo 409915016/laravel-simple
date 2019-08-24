@@ -1,21 +1,51 @@
 @extends('layout')
 
+@section('title', 'Customer List')
+
 @section('content')
-    <h1>Customers</h1>
 
 
-    <form action="customers" method="POST" class="pb-5">
-        <div class="input-group">
-            <input type="text" name="name">
+    <div class="row">
+        <div class="col-12"><h1>Customer List</h1></div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <form action="customers" method="POST" class="">
+
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" value="{{ old('name') }}">
+                    <div>{{ $errors->first('name') }}</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Email</label>
+                    <input type="text" name="email" value="{{ old('email') }}">
+                    <div>{{ $errors->first('email') }}</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Customer</button>
+
+                @csrf
+            </form>
         </div>
-        @csrf
-        <button type="submit">Add Customer </button>
-    </form>
+    </div>
 
-    <ul>
-        @foreach ($customers as $item)
-            <li> {{ $item->name }}</li>
-        @endforeach
-    </ul>
+    <div class="row">
+        <div class="col-12">
+            <ul>
+                @foreach ($customers as $item)
+                    <li> {{ $item->name }} <span class="">({{ $item->email }})</span></li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
+
+
+
+
+
+
 @endsection
 
