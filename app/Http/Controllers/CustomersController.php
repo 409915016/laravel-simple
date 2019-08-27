@@ -8,38 +8,64 @@ use Illuminate\Http\Request;
 
 class CustomersController extends Controller
 {
-    public function index()
-    {
-    	    $customers = Customer::all();
-//    	  $activeCustomers = Customer::active()->get();
-//	      $inactiveCustomers = Customer::inactive()->get();
+	public function index()
+	{
+		$customers = Customer::all();
 
+		return view('customers.index', compact('customers'));
+	}
 
-        return view('customers.index', compact('customers'));
-    }
+	public function create()
+	{
+		$companies = Company::all();
 
-    public function create()
-    {
-	    $companies = Company::all();
-			return view('customers.create', compact('companies'));
-    }
+		$customer = new Customer();
 
-    public function store()
-    {
-        $data = request()->validate([
-            'name' => 'required|min:3',
-            'email' => 'required|email',
-		        'active' => 'required',
-	          'company_id'=>'required'
-        ]);
+		return view('customers.create', compact('companies', 'customer'));
+	}
 
-	      Customer::create($data);
+	public function store()
+	{
+		Customer::create($this->validateRequest());
 
-        return redirect('customers');
-    }
+		return redirect('customers');
+	}
 
-    public function show(Customer $customer)
-    {
-			return view('customers.show', compact('customer'));
-    }
+	public function show(Customer $customer)
+	{
+		return view('customers.show', compact('customer'));
+	}
+
+	public function edit(Customer $customer)
+	{
+		$companies = Company::all();
+
+		return view('customers.edit', compact('customer', 'companies'));
+	}
+
+	public function update(Customer $customer)
+	{
+
+		$customer->update($this->validateRequest());
+
+		return redirect('customers/' . $customer->id);
+
+	}
+
+	public function validateRequest()
+	{
+		return request()->validate([
+				'name' => 'required|min:3',
+				'email' => 'required|email',
+				'active' => 'required',
+				'company_id' => 'required'
+		]);
+	}
+	public function destroy(Customer $customer){
+
+		$customer->delete();
+
+		return redirect('customers');
+
+	}
 }
