@@ -16,7 +16,7 @@
                 {{ $item->id }}
             </div>
             <div class="col-4">
-                {{ $item->name }}
+                <a href="/customers/{{ $item->id }}"> {{ $item->name }}</a>
             </div>
             <div class="col-4">
                 {{ $item->company->name }}
