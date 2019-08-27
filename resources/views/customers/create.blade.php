@@ -6,12 +6,12 @@
 
 
     <div class="row">
-        <div class="col-12"><h1>Customer List</h1></div>
+        <div class="col-12"><h1>Add New Customer</h1></div>
     </div>
 
     <div class="row">
         <div class="col-12">
-            <form action="customers" method="POST" class="">
+            <form action="/customers" method="POST" class="">
 
                 <div class="form-group">
                     <label for="name">Name</label>
@@ -49,42 +49,6 @@
 
                 @csrf
             </form>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-6">
-            <h3>Active Customers</h3>
-            <ul>
-                @foreach ($activeCustomers as $item)
-                    <li> {{ $item->name }} <span class="text-muted">({{ $item->company->name }})</span></li>
-                @endforeach
-            </ul>
-        </div>
-
-        <div class="col-6">
-            <h3>Inactive Customers</h3>
-            <ul>
-                @foreach ($inactiveCustomers as $item)
-                    <li> {{ $item->name }} <span class="text-muted">({{ $item->company->name }})</span></li>
-                @endforeach
-            </ul>
-        </div>
-
-
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            @foreach ($companies as $item)
-                <h3> {{ $item->name }} </h3>
-
-                <ul>
-                    @foreach($item -> customers as $customer)
-                        <li> {{ $customer->name }}</li>
-                    @endforeach
-                </ul>
-            @endforeach
         </div>
     </div>
 
