@@ -18,7 +18,7 @@ Route::get('contact', 'ContactFormController@create');
 Route::post('contact', 'ContactFormController@store');
 
 Route::view('contact', 'contact.create');
-Route::view('about', 'about');
+Route::view('about', 'about')->middleware('test');
 
 //Route::get('customers', 'CustomersController@index');
 //Route::get('customers/create', 'CustomersController@create');
