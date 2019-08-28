@@ -14,8 +14,8 @@
 
 Route::view('/', 'home');
 
-Route::get('contact', 'ContactFormController@create');
-Route::post('contact', 'ContactFormController@store');
+Route::get('contact', 'ContactFormController@create')->name('contact.create');
+Route::post('contact', 'ContactFormController@store')->name('contact.store');
 
 Route::view('contact', 'contact.create');
 Route::view('about', 'about')->middleware('test');
@@ -32,4 +32,4 @@ Route::resource('customers', 'CustomersController');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'HomeController@index');
