@@ -38,12 +38,6 @@ class CustomersController extends Controller
 
 		event(new NewCustomerHasRegisteredEvent($customer));
 
-		// Register to newsletter
-		dump('Registered to newsletter');
-
-		// Slack notification to Admin
-		dump('Slack massage here');
-
 		//return redirect('customers');
 	}
 
