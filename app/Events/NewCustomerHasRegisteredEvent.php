@@ -23,7 +23,7 @@ class NewCustomerHasRegisteredEvent
      */
     public function __construct($customer)
     {
-        $this->$customer = $customer;
+        $this->customer = $customer;
     }
 
     /**
