@@ -27,7 +27,12 @@
             <option value="{{ $item->id }}" {{ $item->id === $customer->company_id ? 'selected' : '' }}>{{ $item->name }}</option>
         @endforeach
     </select>
+</div>
 
+<div class="form-group d-flex flex-column">
+    <label for="image">Profile Image</label>
+    <input type="file" name="image" class="py-3">
+    <div>{{ $errors->first('image') }}</div>
 </div>
 
 @csrf

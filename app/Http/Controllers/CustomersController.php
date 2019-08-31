@@ -13,7 +13,7 @@ class CustomersController extends Controller
 {
 	public function __construct()
 	{
-		$this->middleware('auth')->except(['index']);
+		//$this->middleware('auth')->except(['index']);
 	}
 
 	public function index()
@@ -35,6 +35,8 @@ class CustomersController extends Controller
 	public function store()
 	{
 		$customer = Customer::create($this->validateRequest());
+
+		$this->storeImage($customer);
 
 		event(new NewCustomerHasRegisteredEvent($customer));
 
@@ -64,12 +66,21 @@ class CustomersController extends Controller
 
 	public function validateRequest()
 	{
-		return request()->validate([
-				'name' => 'required|min:3',
-				'email' => 'required|email',
-				'active' => 'required',
-				'company_id' => 'required'
-		]);
+        return tap(request()->validate([
+            'name' => 'required|min:3',
+            'email' => 'required|email',
+            'active' => 'required',
+            'company_id' => 'required'
+
+        ]), function (){
+
+            if (request()->hasFile('image')){
+                request()->validate([
+                    'image' => 'file|image|max:5000',
+                ]);
+            }
+
+        });
 	}
 	public function destroy(Customer $customer){
 
@@ -78,4 +89,12 @@ class CustomersController extends Controller
 		return redirect('customers');
 
 	}
+
+	private function storeImage($customer){
+        if(request()->has('image')){
+            $customer->update([
+                'image' => request()->image->store('uploads', 'public')
+            ]);
+        }
+    }
 }
