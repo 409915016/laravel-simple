@@ -27,5 +27,11 @@
         </div>
     @endforeach()
 
+    <div class="row">
+        <div class="col-12 d-flex justify-content-center pt-5">
+            {{ $customers->links() }}
+        </div>
+    </div>
+
 @endsection
 
