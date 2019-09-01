@@ -35,6 +35,7 @@ class CustomersController extends Controller
 
 	public function store()
 	{
+	    $this->authorize('create', Customer::class);
 		$customer = Customer::create($this->validateRequest());
 
 		$this->storeImage($customer);
@@ -77,6 +78,8 @@ class CustomersController extends Controller
 	}
 	public function destroy(Customer $customer){
 
+        $this->authorize('delete', $customer);
+
 		$customer->delete();
 
 		return redirect('customers');
@@ -92,7 +95,6 @@ class CustomersController extends Controller
             $image = Image::make(public_path('storage/'. $customer->image))->fit(300, 300, null, 'top-left');
             $image->save();
         }
-
 
     }
 }
