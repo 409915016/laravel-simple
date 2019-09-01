@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Company;
 use App\Customer;
 use App\Mail\WelcomeNewUserMail;
+use Intervention\Image\Facades\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Events\NewCustomerHasRegisteredEvent;
@@ -66,21 +67,13 @@ class CustomersController extends Controller
 
 	public function validateRequest()
 	{
-        return tap(request()->validate([
+        return request()->validate([
             'name' => 'required|min:3',
             'email' => 'required|email',
             'active' => 'required',
-            'company_id' => 'required'
-
-        ]), function (){
-
-            if (request()->hasFile('image')){
-                request()->validate([
-                    'image' => 'file|image|max:5000',
-                ]);
-            }
-
-        });
+            'company_id' => 'required',
+            'image' => 'sometimes|file|image|max:5000',
+        ]);
 	}
 	public function destroy(Customer $customer){
 
@@ -96,5 +89,8 @@ class CustomersController extends Controller
                 'image' => request()->image->store('uploads', 'public')
             ]);
         }
+
+        $image = Image::make(public_path('storage/'. $customer->image))->fit(300, 300, null, 'top-left');
+        $image->save();
     }
 }
