@@ -88,9 +88,11 @@ class CustomersController extends Controller
             $customer->update([
                 'image' => request()->image->store('uploads', 'public')
             ]);
+
+            $image = Image::make(public_path('storage/'. $customer->image))->fit(300, 300, null, 'top-left');
+            $image->save();
         }
 
-        $image = Image::make(public_path('storage/'. $customer->image))->fit(300, 300, null, 'top-left');
-        $image->save();
+
     }
 }
