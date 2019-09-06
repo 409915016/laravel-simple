@@ -38,9 +38,17 @@ Route::get('/', function (){
 
 	$user = factory(\App\User::class)->create();
 
-
-	$user->phone()->create([
-			'phone' => '123-123-1234'
+	$user->posts()->create([
+			'title' => 'Title Here',
+			'body' => 'body Here',
+			'user_id' => $user->id
 	]);
+
+	$user->posts->first()->title = 'New Title';
+	$user->posts->first()->body = 'New Better Body';
+
+	$user->push();
+
+	return $user->posts;
 
 });
