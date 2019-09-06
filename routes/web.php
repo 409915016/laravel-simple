@@ -36,12 +36,14 @@ Route::get('/home', 'HomeController@index');
 
 Route::get('/', function (){
 
-//    $user = \App\User::first();
-//
-//    $user->roles()->syncWithoutDetaching([2]);
+    $user = \App\User::first();
 
-    $role = \App\Role::find(3);
+//    $user->roles()->sync([
+//        1 => [
+//            'name' => 'victor'
+//        ]
+//    ]);
 
-    $role->users()->sync([4]);
+    dd($user->roles->first()->pivot->name);
 
 });
