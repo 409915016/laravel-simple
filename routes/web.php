@@ -36,9 +36,12 @@ Route::get('/home', 'HomeController@index');
 
 Route::get('/', function (){
 
-	$user = \App\User::first();
+//    $user = \App\User::first();
+//
+//    $user->roles()->syncWithoutDetaching([2]);
 
-	$roles = \App\Role::all();
+    $role = \App\Role::find(3);
 
+    $role->users()->sync([4]);
 
 });
