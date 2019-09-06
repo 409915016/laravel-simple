@@ -33,3 +33,7 @@ Route::delete('customers/{customer}', 'CustomersController@destroy')->name('cust
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
+
+
+Route::get('/profile/{profile}', 'ProfilesController@show');
+Route::get('/posts/{post}-{slug}', 'PostsController@show');
