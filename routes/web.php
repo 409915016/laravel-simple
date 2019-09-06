@@ -12,7 +12,7 @@
 */
 
 
-Route::view('/', 'home');
+//Route::view('/', 'home');
 
 Route::get('contact', 'ContactFormController@create')->name('contact.create');
 Route::post('contact', 'ContactFormController@store')->name('contact.store');
@@ -33,3 +33,14 @@ Route::delete('customers/{customer}', 'CustomersController@destroy')->name('cust
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
+
+Route::get('/', function (){
+
+	$user = factory(\App\User::class)->create();
+
+
+	$user->phone()->create([
+			'phone' => '123-123-1234'
+	]);
+
+});
