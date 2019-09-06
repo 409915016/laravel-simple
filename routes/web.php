@@ -36,19 +36,9 @@ Route::get('/home', 'HomeController@index');
 
 Route::get('/', function (){
 
-	$user = factory(\App\User::class)->create();
+	$user = \App\User::first();
 
-	$user->posts()->create([
-			'title' => 'Title Here',
-			'body' => 'body Here',
-			'user_id' => $user->id
-	]);
+	$roles = \App\Role::all();
 
-	$user->posts->first()->title = 'New Title';
-	$user->posts->first()->body = 'New Better Body';
-
-	$user->push();
-
-	return $user->posts;
 
 });
