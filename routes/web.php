@@ -12,7 +12,11 @@
 */
 
 
-Route::view('/', 'home');
+Route::get('/', function (){
+    App::setLocale('en');
+
+    return view('home');
+});
 
 Route::get('contact', 'ContactFormController@create')->name('contact.create');
 Route::post('contact', 'ContactFormController@store')->name('contact.store');

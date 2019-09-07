@@ -14,7 +14,9 @@
                         </div>
                     @endif
 
-                    You are logged in!
+                    <div class="title m-b-md">
+                        {{ __('text.introduction', ['user' => 'Mather']) }}
+                    </div>
                 </div>
             </div>
         </div>
