@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
-    protected $guarded = [];
+//    protected $guarded = [];
+
+    protected $fillable = [
+        'name', 'price', 'quantity'
+    ];
 
     public function customers()
     {
