@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Company;
 use App\Customer;
+use App\Http\Requests\StoreCustomer;
 use App\Mail\WelcomeNewUserMail;
 use Intervention\Image\Facades\Image;
 use Illuminate\Http\Request;
@@ -33,10 +34,11 @@ class CustomersController extends Controller
 		return view('customers.create', compact('companies', 'customer'));
 	}
 
-	public function store()
+	public function store(StoreCustomer $request)
 	{
-	    $this->authorize('create', Customer::class);
-		$customer = Customer::create($this->validateRequest());
+		$this->authorize('create', Customer::class);
+
+		$customer = Customer::create($request ->validated());
 
 		$this->storeImage($customer);
 
@@ -68,17 +70,19 @@ class CustomersController extends Controller
 
 	public function validateRequest()
 	{
-        return request()->validate([
-            'name' => 'required|min:3',
-            'email' => 'required|email',
-            'active' => 'required',
-            'company_id' => 'required',
-            'image' => 'sometimes|file|image|max:5000',
-        ]);
+		return request()->validate([
+				'name'       => 'required|min:3',
+				'email'      => 'required|email',
+				'active'     => 'required',
+				'company_id' => 'required',
+				'image'      => 'sometimes|file|image|max:5000',
+		]);
 	}
-	public function destroy(Customer $customer){
 
-        $this->authorize('delete', $customer);
+	public function destroy(Customer $customer)
+	{
+
+		$this->authorize('delete', $customer);
 
 		$customer->delete();
 
@@ -86,15 +90,15 @@ class CustomersController extends Controller
 
 	}
 
-	private function storeImage($customer){
-        if(request()->has('image')){
-            $customer->update([
-                'image' => request()->image->store('uploads', 'public')
-            ]);
+	private function storeImage($customer)
+	{
+		if (request()->has('image')) {
+			$customer->update([
+					'image' => request()->image->store('uploads', 'public')
+			]);
+			$image = Image::make(public_path('storage/' . $customer->image))->fit(300, 300, null, 'top-left');
+			$image->save();
+		}
 
-            $image = Image::make(public_path('storage/'. $customer->image))->fit(300, 300, null, 'top-left');
-            $image->save();
-        }
-
-    }
+	}
 }
