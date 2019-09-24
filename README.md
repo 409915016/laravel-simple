@@ -10,21 +10,21 @@ Laravel 作为优雅的 PHP 框架，一直有所耳闻。它拥有 Web 后端�
 
 ---
 
-### 起步
+## 起步
 
-#### 开发环境
+### 开发环境
 
 在这之前需要一套开发的基础环境，至少包括：
 
 - PHP 及它的包管理工具 Composer
 - HTTP 服务器 Nginx
-- 关系型数据库 MySQL 
+- 关系型数据库 MySQL
 
 这里我用的是 [PhpStudy  Windows 2016 版本](https://www.xp.cn/wenda/407.html) ，当然你也可以自行搭建。
 
 ---
 
-#### 创建新项目
+### 创建新项目
 
 传统的方式是从 Git 仓库中克隆到本地。像前端 Vue CLI 一样，优雅的 Laravel 也有自家的手脚架，可快速地创建新项目.
 
@@ -42,14 +42,14 @@ laravel new laravel-project
 
 ---
 
-#### 项目配置
+### 项目配置
 
-##### HTTP 服务器 
+#### HTTP 服务器
 
 > [重装后恢复 phpstudy 提供的开发环境](https://misaka.im/index.php/archives/49/)
 
 
-##### 环境变量文件 .env
+#### 环境变量文件 .env
 
 独立的环境配置文件，在这里可以修改数据库驱动，与线上环境区分开。
 连接本地的 MySQL 服务：
@@ -67,26 +67,26 @@ DB_PASSWORD=
 
 
 
-### Artisan 命令行
+## Artisan 命令行
 
 学习变成的前期，我们还在手动创建源文件。 Laravel 命令行工具带来了一套全新的操作，创建模型、控制器、数据库种子文件，并将有关的功能关联起来，省去了手动操作的麻烦。
 
 创建 `TestController` 的控制器：
 
 ```cmd
-php artisan make:controller TestController 
+php artisan make:controller TestController
 ```
 创建 `Test` 的模型，和对应的数据库迁移文件：
 
 ```cmd
 php artisan make:model Test -m
 ```
- 
+
 ---
 
-### 基础功能
+## 基础功能
 
-#### 路由
+### 路由
 
 Nginx 将浏览器请求的 [URL](https://zh.wikipedia.org/wiki/%E7%BB%9F%E4%B8%80%E8%B5%84%E6%BA%90%E5%AE%9A%E4%BD%8D%E7%AC%A6) 转发到 Laravel 里，这样就能针对不同的路径和查询参数，处理结果给客户端。
 
@@ -117,7 +117,7 @@ DELETE    | `/customers/{id}`      | destroy      | customers.destroy
 
 ---
 
-#### 控制器
+### 控制器
 
 我们可以在路由文件中处理所有的请求逻辑，随着时间的推移，路由会变得十分拥挤。
 
@@ -133,7 +133,7 @@ Route::get('test', function (){
 同样，使用 Artisan 助手创建控制器文件：
 
 ```cmd
-php artisan make:controller CustomersController 
+php artisan make:controller CustomersController
 ```
 
 将逻辑代码迁移到控制器中：
@@ -177,7 +177,7 @@ Route::get('customers', 'CustomersController@index')
 ---
 
 
-#### 表单验证
+### 表单验证
 
 在控制器中我们可以渲染对应的视图，也可获取从客户端发来的 HTTP 请求，一般称为表单数据。
 
@@ -191,13 +191,73 @@ Route::get('customers', 'CustomersController@index')
 Route::post('customers', 'CustomersController@store')->name('customers.store');
 ```
 
+除了控制器，还需要使用 **模型** 与数据库建立关系，并创建数据库迁移文件：
+
+```cmd
+php artisan make:model CustomersModel -m
+```
+
+数据库迁移文件替代了我们手动在数据库中添加字段，改变结构。创建关于 `Customer` 表的字段描述：
+
+
+```php
+
+class CreateCustomersTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('customers', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name');
+            $table->string('email');
+            $table->timestamps();
+        });
+    }
+}
+
+```
+
+别忘了创建完后刷新数据表：
+
+```cmd
+php artisan migrate:refresh
+```
+
+同时，为了不让复杂的验证逻辑堆积在 `Controller` 中，创建一个 `StoreCustomer` 表单请求类来处理：
+
+```cmd
+php artisan make:request StoreCustomer
+```
+
+配置验证规则 `name` `email` ：
+
+```php
+class StoreCustomer extends FormRequest
+{
+
+    public function authorize()
+    {
+        return true;
+    }
+
+    public function rules()
+    {
+        return [
+            'name'       => 'required|min:3',
+            'email'      => 'required|email'
+        ];
+    }
+}
+```
+
+这样不需要在控制器中写任何验证逻辑：
 
 ```php
 class CustomersController extends Controller
 {
-	public function store()
+	public function store(StoreCustomer $request)
 	{
-		$customer = Customer::create($this->validateRequest());
+		$customer = Customer::create($request->validated());
 
 		return redirect('customers');
 	}
@@ -205,25 +265,12 @@ class CustomersController extends Controller
 
 ```
 
-`CustomersController` 控制器通过操作 `Customer` 模型的 `create` 方法，将数据新增到数据库中。`$this->validateRequest()` 内部如下：
+`CustomersController` 控制器通过操作 `Customers` 模型的 `create` 方法，将数据新增到数据库中。
 
-```php
-class CustomersController extends Controller
-{
-	public function validateRequest()
-	{
-		return request()->validate([
-				'name'  => 'required|min:3',
-				'email' => 'required|email',
-		]);
-	}
-}
-```
- 
 ---
 
 
-#### 模板引擎（视图）
+### 模板引擎（视图）
 
 它支撑了页面渲染，在修改 blade 文件后编译并缓存起来。如多数前端框架的视图层一样，具有模板继承、扩展、逻辑判断等基础功能。
 
@@ -277,7 +324,7 @@ class CustomersController extends Controller
 
 `@section` 与 `@yield` 都是在**母版中定义**可替代的区块，在**子模板中使用** `@section` 来扩展区块时，表现并不相同；
 
-##### @yield
+#### @yield
 
 @yield 并**不能扩展**原来有母版中的内容，使用 `@parent` 关键字也不能让原有的内容与扩展内容并存
 
@@ -299,10 +346,10 @@ class CustomersController extends Controller
 结果：
 
 ```php
-新的标题 
+新的标题
 ```
 
-##### @section
+#### @section
 
 `@section` 用来继承并扩展原有区块的内容。子模板中使用 `@parent` 使得母版中原有的内容被保留，然后融合新的内容。
 
@@ -326,10 +373,10 @@ class CustomersController extends Controller
 结果：
 
 ```php
-默认的内容 扩展的内容 
+默认的内容 扩展的内容
 ```
 
-##### @show & @stop
+#### @show & @stop
 
 - 建议在定义 `@section` 时用 `@show` 结尾，替换或扩展时用 `@stop` 结尾
 - 解析子模板时遇到 `@show` 结尾的区块会立即显示内容，然后套用模板继承机制，继续渲染内容
@@ -396,7 +443,7 @@ This is zone C slave
 这种错误的写法导致 `zone B` 区块丢失，并且使扩展的 `This is zone C slave`内容过早出现在页面的首位。
 
 
-##### @append
+#### @append
 
 `@append` 用于多次将内容添加到对应的区块中
 
@@ -418,21 +465,21 @@ This is zone C slave
 
 
 
-### 单元测试
+## 单元测试
 
 ---
 
 
-### 总结
+## 总结
 
 只有你对 Laravel [理解熟透](https://learnku.com/docs/laravel/5.8)，才能站在巨人的肩上，走得更远。
 
 ---
 
 
-### 参考
+## 参考
 
-- [Laravel 5.8 Tutorial From by 
+- [Laravel 5.8 Tutorial From by
 Coder's Tape Scratch- YouTube][1]
 - [Laravel 5.8 中文文档 - LearnKu](https://learnku.com/docs/laravel/5.8)
 
