@@ -41,3 +41,5 @@ Route::get('/home', 'HomeController@index');
 
 Route::get('/profile/{profile}', 'ProfilesController@show');
 Route::get('/posts/{post}-{slug}', 'PostsController@show');
+
+Route::post('books', 'BooksController@store');
