@@ -9,12 +9,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BooksTest extends TestCase
 {
-	use RefreshDatabase;
-
-	protected function setUp(): void
-	{
-		parent::setUp();
-	}
 
 	public function test_a_title_is_required()
 	{
