@@ -38,7 +38,7 @@ class BooksController extends Controller
     {
         $book = Book::create($request ->validated());
 
-
+        return response()->json(['code' => '200', 'msg'=> 'ok']);
     }
 
     /**

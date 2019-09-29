@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 class StoreBook extends FormRequest
 {
@@ -28,4 +31,26 @@ class StoreBook extends FormRequest
             'author'      => 'required'
         ];
     }
+
+	public function messages()
+	{
+		return [
+			'title.required' => 'A title is required',
+			'author.required'  => 'A author is required',
+		];
+	}
+
+	protected function failedValidation(Validator $validator)
+	{
+
+		$data = [
+			'code' => 422,
+			'msg' => $validator->errors()->first(),
+		];
+		$response = new Response(json_encode($data));
+		throw (new ValidationException($validator, $response))
+			->errorBag($this->errorBag)
+			->redirectTo($this->getRedirectUrl());
+	}
+
 }
