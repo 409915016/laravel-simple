@@ -49,7 +49,7 @@ class StoreBook extends FormRequest
 			'code' => 422,
 			'msg' => $validator->errors()->first(),
 		];
-		$response = new Response(json_encode($data));
+		$response = new Response(json_encode($data), 422);
 		throw (new ValidationException($validator, $response))
 			->errorBag($this->errorBag)
 			->redirectTo($this->getRedirectUrl());
