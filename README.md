@@ -114,161 +114,7 @@ GET       | `/customers/{id}/edit` | edit         | customers.edit
 PUT/PATCH | `/customers/{id}`      | update       | customers.update
 DELETE    | `/customers/{id}`      | destroy      | customers.destroy
 
-
 ---
-
-### 控制器
-
-我们可以在路由文件中处理所有的请求逻辑，随着时间的推移，路由会变得十分拥挤。
-
-
-```php
-Route::get('test', function (){
-	return 'hello world!';
-});
-```
-
-一般控制器文件约定被存放在 `app/Http/Controllers`目录中。
-
-同样，使用 Artisan 助手创建控制器文件：
-
-```cmd
-php artisan make:controller CustomersController
-```
-
-将逻辑代码迁移到控制器中：
-
-```php
-<?php
-
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-
-class CustomersController extends Controller
-{
-    public function index() {
-	    $customers = [
-		    'John Doe',
-		    'Jane Doe',
-		    'Bob The Builder',
-	    ];
-
-	    return view('internals.customers',[
-		    'customers' => $customers
-	    ]);
-    }
-}
-
-```
-
-```php
-Route::get('customers', 'CustomersController@index')
-    ->name('customers.index');
-```
-
-当 get 请求与路由 URI 匹配时，`CustomersController` 控制器中的 `index` 方法就会被执行，将数据渲染到对应的视图。
-
-
-
-> 这里的 `Customers` 控制器继承框架提供的 `Controller` 基类，这样可以使用 Laravel 提供的控制器功能。
-
-
----
-
-
-### 表单验证
-
-在控制器中我们可以渲染对应的视图，也可获取从客户端发来的 HTTP 请求，一般称为表单数据。
-
-有段时间，我在编写前端代码，使用了若干个流程控制语句 `if` 来判断用户输入的内容是否为空，是否符合正则或其他格式，最终达到表单校验的需求。
-
-如上一小节所说，继承了 `Controller` 控制器基类，它提供了一系列方法去验证请求。
-
-同样，在路由文件声明到达控制器的路径和方法：
-
-```php
-Route::post('customers', 'CustomersController@store')->name('customers.store');
-```
-
-除了控制器，还需要使用 **模型** 与数据库建立关系，并创建数据库迁移文件：
-
-```cmd
-php artisan make:model CustomersModel -m
-```
-
-数据库迁移文件替代了我们手动在数据库中添加字段，改变结构。创建关于 `Customer` 表的字段描述：
-
-
-```php
-
-class CreateCustomersTable extends Migration
-{
-    public function up()
-    {
-        Schema::create('customers', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('name');
-            $table->string('email');
-            $table->timestamps();
-        });
-    }
-}
-
-```
-
-别忘了创建完后刷新数据表：
-
-```cmd
-php artisan migrate:refresh
-```
-
-同时，为了不让复杂的验证逻辑堆积在 `Controller` 中，创建一个 `StoreCustomer` 表单请求类来处理：
-
-```cmd
-php artisan make:request StoreCustomer
-```
-
-配置验证规则 `name` `email` ：
-
-```php
-class StoreCustomer extends FormRequest
-{
-
-    public function authorize()
-    {
-        return true;
-    }
-
-    public function rules()
-    {
-        return [
-            'name'       => 'required|min:3',
-            'email'      => 'required|email'
-        ];
-    }
-}
-```
-
-这样不需要在控制器中写任何验证逻辑：
-
-```php
-class CustomersController extends Controller
-{
-	public function store(StoreCustomer $request)
-	{
-		$customer = Customer::create($request->validated());
-
-		return redirect('customers');
-	}
-}
-
-```
-
-`CustomersController` 控制器通过操作 `Customers` 模型的 `create` 方法，将数据新增到数据库中。
-
----
-
 
 ### 模板引擎（视图）
 
@@ -463,9 +309,348 @@ This is zone C slave
 
 ---
 
+### 控制器
+
+我们可以在路由文件中处理所有的请求逻辑，随着时间的推移，路由会变得十分拥挤。
 
 
-## 单元测试
+```php
+Route::get('test', function (){
+	return 'hello world!';
+});
+```
+
+一般控制器文件约定被存放在 `app/Http/Controllers`目录中。
+
+同样，使用 Artisan 助手创建控制器文件：
+
+```cmd
+php artisan make:controller CustomersController
+```
+
+将逻辑代码迁移到控制器中：
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class CustomersController extends Controller
+{
+    public function index() {
+	    $customers = [
+		    'John Doe',
+		    'Jane Doe',
+		    'Bob The Builder',
+	    ];
+
+	    return view('internals.customers',[
+		    'customers' => $customers
+	    ]);
+    }
+}
+
+```
+
+```php
+Route::get('customers', 'CustomersController@index')
+    ->name('customers.index');
+```
+
+当 get 请求与路由 URI 匹配时，`CustomersController` 控制器中的 `index` 方法就会被执行，将数据渲染到对应的视图。
+
+
+
+> 这里的 `Customers` 控制器继承框架提供的 `Controller` 基类，这样可以使用 Laravel 提供的控制器功能。
+
+
+---
+
+
+### 表单验证
+
+在控制器中我们可以渲染对应的视图，也可获取从客户端发来的 HTTP 请求，一般称为表单数据。
+
+有段时间，我在编写前端代码，使用了若干个流程控制语句 `if` 来判断用户输入的内容是否为空，是否符合正则或其他格式，最终达到表单校验的需求。
+
+如上一小节所说，继承了 `Controller` 控制器基类，它提供了一系列方法去验证请求。
+
+在使用表单验证功能之前，先创建一个基本的例子：
+
+创建**控制器**
+
+```cmd
+php artisan make:controller BooksController -m -r
+```
+
+> `app/Http/Controllers/BooksController.php`
+
+
+同样，在路由文件声明到达控制器的路径和方法：
+
+```php
+Route::post('books', 'BooksController@store');
+```
+
+除了控制器，还需要使用 **模型** 与数据库建立关系，并创建数据库迁移文件：
+
+```cmd
+php artisan make:model Book -m
+```
+
+Book 模型配置 `$guarded` 属性类似于黑名单机制，经过 Model 过滤后再写入数据库
+
+```php
+//app/Book.php
+protected $guarded = [];
+```
+
+
+**数据库迁移文件**替代了我们手动在数据库中添加字段，改变结构。创建关于 `Books` 表的字段描述，书名和作者：
+
+```php
+//database/migrations/2019_09_26_152922_create_books_table.php
+class CreateBooksTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('customers', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('title');
+            $table->string('author');
+            $table->timestamps();
+        });
+    }
+}
+
+```
+
+别忘了创建完后刷新数据表：
+
+```cmd
+php artisan migrate
+```
+
+同时，为了不让复杂的验证逻辑堆积在 `Controller` 中，创建一个 `StoreCustomer` **表单请求**类来处理：
+
+```cmd
+php artisan make:request StoreBook
+```
+
+配置 `rules` 函数返回一组验证字段：
+
+- `title` `author` 为必填项，
+- 当 `type` 项为 `ebook` 时 `file` 项为必填
+
+配置 `messages` 可以自定义校检的错误信息：
+
+```php
+class StoreBook extends FormRequest
+{
+
+    public function authorize()
+    {
+        return true;
+    }
+
+    public function rules()
+    {
+        return [
+	        'title'  => 'required|min:3',
+	        'author' => 'required',
+	        'type'   => '',
+	        'file'   => 'required_if:type,ebook'
+        ];
+    }
+
+    public function messages()
+	{
+		return [
+			'title.required'   => 'A title is required',
+			'author.required'  => 'A author is required',
+		];
+	}
+}
+```
+
+这样不需要在控制器中写任何验证逻辑，`BooksController` 控制器通过操作 `Book` 模型的 `create` 方法，将数据新增到数据库中。
+
+```php
+class BooksController extends Controller
+{
+	public function store(StoreBook $request)
+	{
+        $book = Book::create($request ->validated());
+
+        return response()->json(['code' => '200', 'msg'=> 'ok']);
+	}
+
+}
+
+```
+
+使用 Postman 发出 POST 请求通过验证器校检，返回 JSON 结构：
+
+```json
+{
+    "code": "200",
+    "msg": "ok"
+}
+```
+
+在 `Requests/StoreBook.php` 创建 `failedValidation`  优化验证失败的返回内容：
+
+```php
+//app/Http/Requests/StoreBook.php
+
+protected function failedValidation(Validator $validator)
+{
+
+	$data = [
+		'code' => 422,
+		'msg' => $validator->errors()->first(),
+	];
+	$response = new Response(json_encode($data), 422);
+	throw (new ValidationException($validator, $response))
+		->errorBag($this->errorBag)
+		->redirectTo($this->getRedirectUrl());
+}
+
+```
+
+当 title 字段没有通过校检：
+
+```json
+{
+    "code": 422,
+    "msg": "The title must be at least 3 characters."
+}
+```
+
+当 type 字段为 ebook 时，没有提交 file 字段：
+
+```json
+{
+    "code": 422,
+    "msg": "The file field is required when type is ebook."
+}
+```
+
+
+---
+
+## HTTP 单元测试
+
+刚入门的程序员，使用各种工具发出 HTTP 请求，并观察自己编写的函数运行正常。
+
+就像上面的表单校验往往需要调试数次，这样做在后期对面堆积如山的接口，调试工作无疑变得复杂，如果我们可以使用编程方式，按照项目需求编写若干完整请求和结果验证器，或许可以事半功倍。
+
+Laravel 结合了 PHPUnit 并提供一些便利的辅助函数，能很好地编写测试用例，比如上一节 `Books` 接口。
+
+别忘了修改测试功能的配置文件 `phpunit.xml`。使用 `laravel_test` 数据库，这样能避免与开发数据库内容冲突：
+
+```xml
+    <php>
+        <server name="TELESCOPE_ENABLED" value="false"/>
+        <server name="DB_CONNECTION" value="mysql"/>
+        <server name="DB_DATABASE" value="laravel_test"/>
+    </php>
+```
+
+同样，创建测试文件 `php artisan make:test BooksTest`，并填充一些基本的表单数据：
+
+```php
+
+class BooksTest extends TestCase
+{
+    private function data()
+	{
+		return [
+			'title' => 'Test book title',
+			'author' => 'Test author',
+		];
+	}
+}
+
+```
+
+TestCase 类提供了测试 JSON 的函数，用来发出 HTTP 请求，配合 `assert` 断言方法，判断请求结果是否符合预期，
+比如提交 `title` `author` 字段，正常情况下 Laravel 会返回 `200` 响应头和对应的 JSON：
+
+```php
+public function test_a_book_can_be_added_through_post()
+{
+	$response = $this->json('POST', '/books', $this->data());
+	$response
+		->assertStatus(200)
+		->assertJson([
+			'code' => '200'
+		]);
+}
+```
+
+进入项目根目录，敲入：
+
+```cmd
+.\vendor\bin\phpunit --filter test_a_book_can_be_added_through_post
+
+.                                                                   1 / 1 (100%)
+
+Time: 316 ms, Memory: 16.00 MB
+
+OK (1 test, 2 assertions)
+```
+
+进入 `laravel_test` 数据库，查询 `books` 表所有内容：
+
+```cmd
+mysql> SELECT * FROM books;
++----+-----------------+-------------+---------------------+---------------------+
+| id | title           | author      | created_at          | updated_at          |
++----+-----------------+-------------+---------------------+---------------------+
+|  1 | Test book title | Test author | 2019-09-29 08:52:26 | 2019-09-29 08:52:26 |
++----+-----------------+-------------+---------------------+---------------------+
+1 rows in set (0.00 sec)
+```
+
+假如提交 `title` 字段缺失，我们可以建立这样的测试案例：
+
+```php
+public function test_a_title_is_required()
+{
+	$response = $this->json('POST', '/books', array_merge($this->data(), ['title' => '']) );
+
+	$response
+		->assertStatus(422)
+		->assertJson([
+			'code' => '422'
+		]);
+}
+```
+
+断言返回的 `JSON` 含有 `code: 422` 内容，切响应头的状态为 `422`。
+
+还有当 `type` 项为 `ebook` 时 `file` 项为必填，可以这么编写：
+
+```php
+public function test_the_file_field_is_required_when_type_is_ebook()
+{
+	$response = $this->json('POST', '/books', array_merge($this->data(),[
+		'title'  => '123',
+		'author' => '123',
+		'type'   => 'ebook'
+	]));
+	$response
+		->assertStatus(422)
+		->assertJson([
+			'code' => '422'
+		]);
+}
+```
+
+HTTP 单元测试的颗粒度根据项目内测试压力进行调整，如果前端、测试人员充足，保证表单校验和业务流程。
 
 ---
 
