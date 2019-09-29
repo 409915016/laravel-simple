@@ -27,8 +27,10 @@ class StoreBook extends FormRequest
     public function rules()
     {
         return [
-            'title'       => 'required|min:3',
-            'author'      => 'required'
+	        'title'  => 'required|min:3',
+	        'author' => 'required',
+	        'type'   => '',
+	        'file'   => 'required_if:type,ebook'
         ];
     }
 
